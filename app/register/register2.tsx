@@ -1,5 +1,5 @@
 import { useRoute } from "@react-navigation/native";
-import { useRouter } from "expo-router";         // ← navigation after success
+import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
   StyleSheet,
@@ -18,26 +18,21 @@ type Register2RouteParams = {
 export default function Register2() {
   const route = useRoute();
   const router = useRouter();
+  const apiUrl = process.env.EXPO_PUBLIC_API_URL;
 
-  // ── form state ────────────────────────────────────────────────
   const { email } = (route.params as Register2RouteParams) || {};
   const [emailInput, setEmailInput] = useState(email || "");
-
   const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName]   = useState("");
-
-  const [passwordVisible, setPasswordVisible]     = useState(false);
-  const [rePasswordVisible, setRePasswordVisible] = useState(false);
-
-  const [password, setPassword]     = useState("");
+  const [lastName, setLastName] = useState("");
+  const [password, setPassword] = useState("");
   const [rePassword, setRePassword] = useState("");
-
+  const [passwordVisible, setPasswordVisible] = useState(false);
+  const [rePasswordVisible, setRePasswordVisible] = useState(false);
   const [loading, setLoading] = useState(false);
-  // ──────────────────────────────────────────────────────────────
 
-  // simple client-side validation
   const validateInputs = () => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
     if (!firstName.trim() || !lastName.trim()) {
       Alert.alert("Missing name", "First and Last name are required.");
       return false;
@@ -57,22 +52,32 @@ export default function Register2() {
     return true;
   };
 
-  // create account
   const handleCreateAccount = async () => {
     if (!validateInputs()) return;
 
     setLoading(true);
     try {
-     //  await register(firstName, lastName, emailInput, password); // ← API call
+      const response = await fetch(`${apiUrl}/api/registerstep2`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          firstName,
+          lastName,
+          email: emailInput,
+          password,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData?.error || "Registration failed.");
+      }
+
       Alert.alert("Success", "Account created successfully!", [
-        {
-          text: "OK",
-          onPress: () => router.replace("/login/login1"), // ← adjust to your login route
-        },
+        { text: "OK", onPress: () => router.replace("/login/login1") },
       ]);
     } catch (err: any) {
-      const message = err?.response?.data?.error || "Registration failed. Please try again.";
-      Alert.alert("Error", message);
+      Alert.alert("Error", err.message || "Registration failed");
     } finally {
       setLoading(false);
     }
@@ -80,14 +85,12 @@ export default function Register2() {
 
   return (
     <View style={styles.container}>
-      {/* Progress Bar */}
       <View style={styles.progressBar}>
         <View style={styles.progressDotActive} />
         <View style={styles.progressDotActive} />
         <View style={styles.progressDotInactive} />
       </View>
 
-      {/* Email */}
       <Text style={styles.label}>Email</Text>
       <TextInput
         style={styles.input}
@@ -99,7 +102,6 @@ export default function Register2() {
         keyboardType="email-address"
       />
 
-      {/* First & Last Name */}
       <View style={styles.nameContainer}>
         <View style={styles.nameField}>
           <Text style={styles.label}>First Name</Text>
@@ -111,6 +113,7 @@ export default function Register2() {
             onChangeText={setFirstName}
           />
         </View>
+
         <View style={styles.nameField}>
           <Text style={styles.label}>Last Name</Text>
           <TextInput
@@ -123,7 +126,6 @@ export default function Register2() {
         </View>
       </View>
 
-      {/* Password */}
       <Text style={styles.label}>Enter Password</Text>
       <View style={styles.passwordContainer}>
         <TextInput
@@ -139,7 +141,6 @@ export default function Register2() {
         </TouchableOpacity>
       </View>
 
-      {/* Confirm Password */}
       <Text style={styles.label}>Re-Enter Password</Text>
       <View style={styles.passwordContainer}>
         <TextInput
@@ -155,105 +156,30 @@ export default function Register2() {
         </TouchableOpacity>
       </View>
 
-      {/* Create Account Button */}
       <TouchableOpacity
         style={styles.createAccountButton}
         onPress={handleCreateAccount}
         disabled={loading}
       >
-        {loading ? (
-          <ActivityIndicator color="#fff" />
-        ) : (
-          <Text style={styles.createAccountButtonText}>Create Account</Text>
-        )}
+        {loading ? <ActivityIndicator color="#fff" /> :
+          <Text style={styles.createAccountButtonText}>Create Account</Text>}
       </TouchableOpacity>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#FFFFFF",
-    paddingHorizontal: 20,
-    paddingVertical: 40,
-  },
-  progressBar: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    marginVertical: 20,
-  },
-  progressDotActive: {
-    width: 15,
-    height: 15,
-    borderRadius: 7.5,
-    backgroundColor: "#F28D35",
-    marginHorizontal: 5,
-  },
-  progressDotInactive: {
-    width: 15,
-    height: 15,
-    borderRadius: 7.5,
-    backgroundColor: "#A9A9A9",
-    marginHorizontal: 5,
-  },
-  label: {
-    fontSize: 16,
-    color: "#000000",
-    marginBottom: 10,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: "#A9A9A9",
-    borderRadius: 5,
-    padding: 10,
-    marginBottom: 20,
-    fontSize: 16,
-  },
-  nameContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 20,
-  },
-  nameField: {
-    flex: 1,
-    marginHorizontal: 5,
-  },
-  passwordContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    borderWidth: 1,
-    borderColor: "#A9A9A9",
-    borderRadius: 5,
-    paddingHorizontal: 10,
-    marginBottom: 20,
-  },
-  passwordInput: {
-    flex: 1,
-    fontSize: 16,
-    paddingVertical: 10,
-  },
-  toggleText: {
-    fontSize: 14,
-    color: "#F28D35",
-    marginLeft: 10,
-  },
-  createAccountButton: {
-    backgroundColor: "#F28D35",
-    borderRadius: 25,
-    paddingVertical: 15,
-    alignItems: "center",
-    marginTop: 20,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  createAccountButtonText: {
-    color: "#FFFFFF",
-    fontSize: 18,
-    fontWeight: "bold",
-  },
+  container: { flex: 1, backgroundColor: "#FFFFFF", paddingHorizontal: 20, paddingVertical: 40 },
+  progressBar: { flexDirection: "row", justifyContent: "center", alignItems: "center", marginVertical: 20 },
+  progressDotActive: { width: 15, height: 15, borderRadius: 7.5, backgroundColor: "#F28D35", marginHorizontal: 5 },
+  progressDotInactive: { width: 15, height: 15, borderRadius: 7.5, backgroundColor: "#A9A9A9", marginHorizontal: 5 },
+  label: { fontSize: 16, color: "#000000", marginBottom: 10 },
+  input: { borderWidth: 1, borderColor: "#A9A9A9", borderRadius: 5, padding: 10, marginBottom: 20, fontSize: 16 },
+  nameContainer: { flexDirection: "row", justifyContent: "space-between", marginBottom: 20 },
+  nameField: { flex: 1, marginHorizontal: 5 },
+  passwordContainer: { flexDirection: "row", alignItems: "center", borderWidth: 1, borderColor: "#A9A9A9", borderRadius: 5, paddingHorizontal: 10, marginBottom: 20 },
+  passwordInput: { flex: 1, fontSize: 16, paddingVertical: 10 },
+  toggleText: { fontSize: 14, color: "#F28D35", marginLeft: 10 },
+  createAccountButton: { backgroundColor: "#F28D35", borderRadius: 25, paddingVertical: 15, alignItems: "center", marginTop: 20, elevation: 5 },
+  createAccountButtonText: { color: "#FFFFFF", fontSize: 18, fontWeight: "bold" },
 });
