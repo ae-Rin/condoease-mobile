@@ -2,6 +2,7 @@ import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
+import React from 'react';
 import { Image } from 'react-native';
 import 'react-native-reanimated';
 
@@ -105,6 +106,15 @@ export default function RootLayout() {
           }}
         />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen name="index" options={{ headerShown: false }} />
+        <Stack.Screen name="settings/settings" options={{ headerShown: false }} />
+        <Stack.Screen name="settings/details/name" options={{ headerShown: false }} />
+        <Stack.Screen name="settings/details/email" options={{ headerShown: false }} />
+        <Stack.Screen name="settings/details/birthday" options={{ headerShown: false }} />
+        <Stack.Screen name="settings/details/contact" options={{ headerShown: false }} />
+        <Stack.Screen name="settings/details/tenantid" options={{ headerShown: false }} />
+        <Stack.Screen name="settings/details/emergencycontact" options={{ headerShown: false }} />
+        <Stack.Screen name="settings/appsett/delete" options={{ headerShown: false }} />
         <Stack.Screen name="+not-found" />
       </Stack>
       <StatusBar style="auto" />

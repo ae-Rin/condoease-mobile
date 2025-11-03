@@ -3,6 +3,7 @@ import { useRouter } from "expo-router";
 import React from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
+
 export default function MainPage() {
   const router = useRouter();
 
@@ -19,6 +20,12 @@ export default function MainPage() {
         onPress={() => router.push("/login/login1")} // Navigate to login1.tsx
       >
         <Text style={styles.loginButtonText}>Login</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={styles.loginButton}
+        onPress={() => router.push("/(tabs)")} // Navigate to index.tsx
+      >
+        <Text style={styles.loginButtonText}>Test: To Home</Text>
       </TouchableOpacity>
       <View style={styles.signupContainer}>
         <Text style={styles.signupText}>Don’t have an account? </Text>
