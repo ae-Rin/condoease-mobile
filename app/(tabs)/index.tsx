@@ -1,75 +1,199 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import { IconSymbol } from "@/components/ui/IconSymbol";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useNavigation } from '@react-navigation/native';
+import { useRouter } from "expo-router";
+import React, { useEffect, useState } from "react";
+import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+export default function Index() {
+  const router = useRouter();
+  const navigation = useNavigation();
+  const [userName, setUserName] = useState<string | null>(null);
 
-export default function HomeScreen() {
+  useEffect(() => {
+    const loadUser = async () => {
+      try {
+        const json = await AsyncStorage.getItem('user');
+        if (json) {
+          const u = JSON.parse(json);
+          // try common name fields
+          const name = u?.firstName || u?.name || u?.fullName || null;
+          if (name) {
+            // if we have both firstName and lastName, prefer that
+            if (u?.firstName && u?.lastName) {
+              setUserName(`${u.firstName} ${u.lastName}`);
+            } else {
+              setUserName(name);
+            }
+            return;
+          }
+        }
+      } catch (e) {
+        // ignore parse errors but log for debugging
+        console.warn('Failed to parse user from storage', e);
+      }
+      setUserName(null);
+    };
+
+    loadUser();
+  }, []);
+
+
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
+    <View style={styles.container}>
+      {/* Header */}
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => router.push("../settings/settings")} style={styles.menuButton}>
+          <IconSymbol name="menucard.fill" size={24} color="#000000" />
+        </TouchableOpacity>
         <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
+          source={require("../../assets/images/icon.png")}
+          style={styles.logo}
+          resizeMode="contain"
         />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+
+
+      </View>
+
+      {/* Scrollable Content */}
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+  {/* Welcome Section */}
+  <Text style={styles.welcomeText}>Welcome, {userName ?? 'Guest'}!</Text>
+
+        {/* Announcements */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Announcements</Text>
+          <View style={styles.card}>
+            <Text style={styles.cardTitle}>Announcement Header !!</Text>
+            <Text style={styles.cardDescription}>
+              Announcement description: Lorem ipsum dolor sit amet, consectetur adipiscing elit...
+            </Text>
+          </View>
+        </View>
+
+        {/* Payment and Billing */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Payment and Billing</Text>
+          <TouchableOpacity onPress={() => router.push("/payments")}>
+            <View style={styles.card}>
+              <Text style={styles.cardTitle}>Balance</Text>
+              <Text style={styles.cardSubtitle}>as of MM/DD/YYYY</Text>
+              <Text style={styles.cardValue}>-123,456.78</Text>
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => router.push("/payments")}>
+            <View style={styles.card}>
+              <Text style={styles.cardTitle}>Dues</Text>
+              <Text style={styles.cardSubtitle}>as of MM/DD/YYYY</Text>
+              <Text style={styles.cardValue}>6,543.21</Text>
+            </View>
+          </TouchableOpacity>
+        </View>
+
+        {/* Maintenance Information */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Maintenance Information</Text>
+          <TouchableOpacity onPress={() => router.push("/maintenance")}>
+            <View style={styles.card}>
+              <Text style={styles.cardTitle}>Request Maintenance</Text>
+              <Text style={styles.cardDescription}>Submit a maintenance request form</Text>
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => router.push("/maintenance")}>
+            <View style={styles.card}>
+              <Text style={styles.cardTitle}>Maintenance Status</Text>
+              <Text style={styles.cardDescription}>No ongoing maintenance request</Text>
+            </View>
+          </TouchableOpacity>
+        </View>
+
+        {/* Unit Information */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Unit Information</Text>
+          <View style={styles.card}>
+            <Text style={styles.cardTitle}>Tenant Details</Text>
+            <Text style={styles.cardDescription}>ID, Documents</Text>
+          </View>
+          <View style={styles.card}>
+            <Text style={styles.cardTitle}>Lease & Unit Details</Text>
+            <Text style={styles.cardDescription}>
+              Lease Type, Start & End Date, Amenities
+            </Text>
+          </View>
+        </View>
+      </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+  container: {
+    flex: 1,
+    backgroundColor: "#FFFFFF",
+    paddingBottom: 50,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  header: {
+    flexDirection: "row",
+    justifyContent: "flex-start",
+    alignItems: "center",
+    paddingHorizontal: 20,
+    paddingTop: 40,
+    backgroundColor: "#FFFFFF",
+    borderBottomWidth: 1,
+    borderBottomColor: "#E0E0E0",
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  menuButton: {
+    padding: 5,
+  },
+  logo: {
+    width: 200,
+    height: 50,
+    marginVertical:20,
+  },
+  profileButton: {
+    padding: 10,
+  },
+  scrollContent: {
+    paddingHorizontal: 20,
+    paddingVertical: 20,
+  },
+  welcomeText: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 20,
+  },
+  section: {
+    marginBottom: 20,
+  },
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: "bold",
+    marginBottom: 10,
+  },
+  card: {
+    borderWidth: 1,
+    borderColor: "#8FAF8B",
+    borderRadius: 5,
+    padding: 10,
+    marginBottom: 10,
+  },
+  cardTitle: {
+    fontSize: 14,
+    fontWeight: "bold",
+    color: "#333333",
+  },
+  cardSubtitle: {
+    fontSize: 12,
+    color: "#333333",
+  },
+  cardValue: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#333333",
+  },
+  cardDescription: {
+    fontSize: 12,
+    color: "#333333",
   },
 });
