@@ -74,7 +74,7 @@ export default function Register2() {
       }
 
       Alert.alert("Success", "Account created successfully!", [
-        { text: "OK", onPress: () => router.replace("/login/login1") },
+        { text: "OK", onPress: () => router.replace("/login/login") },
       ]);
     } catch (err: any) {
       Alert.alert("Error", err.message || "Registration failed");

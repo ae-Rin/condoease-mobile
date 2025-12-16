@@ -82,7 +82,7 @@ export default function Register1() {
       <View style={styles.footer}>
         <Text style={styles.footerText}>
           Already have an account?{" "}
-          <TouchableOpacity onPress={() => router.push("/login/login1")}>
+          <TouchableOpacity onPress={() => router.push("/login/login")}>
             <Text style={styles.footerLink}>Login</Text>
           </TouchableOpacity>
         </Text>

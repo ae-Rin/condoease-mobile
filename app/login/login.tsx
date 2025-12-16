@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-export default function Login2() {
+export default function Login() {
   const router = useRouter();
   const { email: passedEmail } = useLocalSearchParams();
   const [email, setEmail] = useState(

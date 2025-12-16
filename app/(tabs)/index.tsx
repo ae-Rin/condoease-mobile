@@ -9,6 +9,7 @@ export default function Index() {
   const router = useRouter();
   const navigation = useNavigation();
   const [userName, setUserName] = useState<string | null>(null);
+  // const API_URl = process.env.EXPO_PUBLIC_API_URL;
 
   useEffect(() => {
     const loadUser = async () => {

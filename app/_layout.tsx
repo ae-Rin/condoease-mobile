@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
@@ -5,7 +6,6 @@ import { StatusBar } from 'expo-status-bar';
 import React from 'react';
 import { Image } from 'react-native';
 import 'react-native-reanimated';
-
 import { useColorScheme } from '@/hooks/useColorScheme';
 
 export default function RootLayout() {
@@ -29,7 +29,7 @@ export default function RootLayout() {
           }}
         />
         <Stack.Screen
-          name="login/login1"
+          name="login/login"
           options={{
             title: "Login", // Custom title for the header
             headerTitle: () => (

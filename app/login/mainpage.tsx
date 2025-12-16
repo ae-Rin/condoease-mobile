@@ -17,7 +17,7 @@ export default function MainPage() {
       <Text style={styles.subtitle}>Lorem ipsum dolor sit amet</Text>
       <TouchableOpacity
         style={styles.loginButton}
-        onPress={() => router.push("/login/login1")} // Navigate to login1.tsx
+        onPress={() => router.push("/login/login")} // Navigate to login.tsx
       >
         <Text style={styles.loginButtonText}>Login</Text>
       </TouchableOpacity>
