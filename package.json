@@ -19,21 +19,14 @@
     "typescript": "~5.8.3"
   },
   "dependencies": {
-<<<<<<<<< Temporary merge branch 1
     "@expo/vector-icons": "^14.1.0",
     "@react-native-async-storage/async-storage": "^2.2.0",
     "@react-native-picker/picker": "^2.11.4",
-=========
-    "@expo/vector-icons": "^15.0.3",
-    "@react-native-async-storage/async-storage": "2.2.0",
-    "@react-native-picker/picker": "^2.11.1",
->>>>>>>>> Temporary merge branch 2
     "@react-navigation/bottom-tabs": "^7.3.10",
     "@react-navigation/elements": "^2.3.8",
     "@react-navigation/native": "^7.1.6",
     "@types/react-native-dotenv": "^0.2.2",
     "axios": "^1.10.0",
-<<<<<<<<< Temporary merge branch 1
     "expo": "~53.0.17",
     "expo-blur": "~14.1.5",
     "expo-constants": "~17.1.7",
@@ -61,31 +54,6 @@
     "react-native-web": "~0.20.0",
     "react-native-webview": "^13.13.5",
     "react-native-worklets": "^0.5.2"
-=========
-    "expo": "~54.0.0",
-    "expo-blur": "~15.0.8",
-    "expo-constants": "~18.0.12",
-    "expo-font": "~14.0.10",
-    "expo-haptics": "~15.0.8",
-    "expo-image": "~3.0.11",
-    "expo-image-picker": "~17.0.10",
-    "expo-linking": "~8.0.10",
-    "expo-router": "~6.0.19",
-    "expo-splash-screen": "~31.0.12",
-    "expo-status-bar": "~3.0.9",
-    "expo-symbols": "~1.0.8",
-    "expo-system-ui": "~6.0.9",
-    "expo-web-browser": "~15.0.10",
-    "react": "19.1.0",
-    "react-dom": "19.1.0",
-    "react-native": "0.81.5",
-    "react-native-gesture-handler": "~2.28.0",
-    "react-native-reanimated": "~4.1.1",
-    "react-native-safe-area-context": "~5.6.0",
-    "react-native-screens": "~4.16.0",
-    "react-native-web": "^0.21.0",
-    "react-native-webview": "13.15.0"
->>>>>>>>> Temporary merge branch 2
   },
   "compilerOptions": {
     "target": "esnext",
@@ -100,15 +68,5 @@
       "react-native-dotenv"
     ]
   },
-<<<<<<<<< Temporary merge branch 1
-=========
-  "devDependencies": {
-    "@babel/core": "^7.25.2",
-    "@types/react": "~19.1.10",
-    "eslint": "^9.25.0",
-    "eslint-config-expo": "~10.0.0",
-    "typescript": "~5.9.2"
-  },
->>>>>>>>> Temporary merge branch 2
   "private": true
 }
