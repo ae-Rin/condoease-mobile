@@ -4,12 +4,30 @@ import { useNavigation } from '@react-navigation/native';
 import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import axios from "axios";
 
 export default function Index() {
   const router = useRouter();
   const navigation = useNavigation();
   const [userName, setUserName] = useState<string | null>(null);
-  // const API_URl = process.env.EXPO_PUBLIC_API_URL;
+  const API_URL = process.env.EXPO_PUBLIC_API_URL;
+  const [announcements, setAnnouncements] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadAnnouncements = async () => {
+      try {
+        const res = await axios.get(`${API_URL}/api/announcements`);
+        setAnnouncements(res.data);
+      } catch (err) {
+        console.error("Failed to load announcements", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (API_URL) loadAnnouncements();
+  }, [API_URL]);
 
   useEffect(() => {
     const loadUser = async () => {
@@ -17,10 +35,8 @@ export default function Index() {
         const json = await AsyncStorage.getItem('user');
         if (json) {
           const u = JSON.parse(json);
-          // try common name fields
           const name = u?.firstName || u?.name || u?.fullName || null;
           if (name) {
-            // if we have both firstName and lastName, prefer that
             if (u?.firstName && u?.lastName) {
               setUserName(`${u.firstName} ${u.lastName}`);
             } else {
@@ -30,7 +46,6 @@ export default function Index() {
           }
         }
       } catch (e) {
-        // ignore parse errors but log for debugging
         console.warn('Failed to parse user from storage', e);
       }
       setUserName(null);
@@ -38,6 +53,45 @@ export default function Index() {
 
     loadUser();
   }, []);
+
+  useEffect(() => {
+    if (!API_URL) return
+
+    const wsProtocol = API_URL.startsWith('https') ? 'wss' : 'ws'
+    const wsUrl = `${wsProtocol}://${API_URL.replace(/^https?:\/\//, '')}/ws/announcements`
+    const ws = new WebSocket(wsUrl)
+
+    ws.onopen = () => {
+      console.log('Announcements WebSocket connected')
+    }
+    ws.onmessage = (msg) => {
+      try {
+        const { event, data } = JSON.parse(msg.data)
+
+        if (event === 'new_announcement') {
+          setAnnouncements((prev) => {
+            const exists = prev.some((a) => a.id === data.id)
+            return exists ? prev : [data, ...prev]
+          })
+        }
+        if (event === 'archive_announcement') {
+          setAnnouncements((prev) => prev.filter((a) => a.id !== data.id))
+        }
+      } catch (e) {
+        console.error('Invalid WS message', e)
+      }
+    }
+
+    ws.onerror = (err) => {
+      console.error('WebSocket error', err)
+    }
+    ws.onclose = () => {
+      console.log('Announcements WebSocket closed')
+    }
+    return () => {
+      ws.close()
+    }
+  }, [API_URL])
 
 
 
@@ -59,18 +113,25 @@ export default function Index() {
 
       {/* Scrollable Content */}
       <ScrollView contentContainerStyle={styles.scrollContent}>
-  {/* Welcome Section */}
-  <Text style={styles.welcomeText}>Welcome, {userName ?? 'Guest'}!</Text>
+        <Text style={styles.welcomeText}>Welcome, {userName ?? 'Guest'}!</Text>
 
         {/* Announcements */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Announcements</Text>
-          <View style={styles.card}>
-            <Text style={styles.cardTitle}>Announcement Header !!</Text>
-            <Text style={styles.cardDescription}>
-              Announcement description: Lorem ipsum dolor sit amet, consectetur adipiscing elit...
-            </Text>
-          </View>
+          {loading && <Text>Loading announcements...</Text>}
+          {announcements.map((a) => (
+            <View key={a.id} style={styles.card}>
+              <Text style={styles.cardTitle}>{a.title}</Text>
+              <Text style={styles.cardDescription}>{a.description}</Text>
+              {a.file_url && (
+                <Image
+                  source={{ uri: a.file_url }}
+                  style={{ width: "100%", height: 180, marginTop: 10, borderRadius: 6 }}
+                  resizeMode="cover"
+                />
+              )}
+            </View>
+          ))}
         </View>
 
         {/* Payment and Billing */}
@@ -150,7 +211,7 @@ const styles = StyleSheet.create({
   logo: {
     width: 200,
     height: 50,
-    marginVertical:20,
+    marginVertical: 20,
   },
   profileButton: {
     padding: 10,
