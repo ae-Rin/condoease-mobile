@@ -10,33 +10,32 @@ export default function Index() {
   const router = useRouter();
   const navigation = useNavigation();
   const [userName, setUserName] = useState<string | null>(null);
-  const API_URL = process.env.EXPO_PUBLIC_API_URL;
+  const apiUrl = process.env.EXPO_PUBLIC_API_URL;
   const [announcements, setAnnouncements] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
   const loadAnnouncements = async () => {
     try {
-      const token = await AsyncStorage.getItem("token");
+      // const token = await AsyncStorage.getItem("token");
       // const json = await AsyncStorage.getItem("user");
       // const u = json ? JSON.parse(json) : null;
       // const token = u?.token;
-      const res = await axios.get(`${API_URL}/api/announcements`, {
-        headers: token
-          ? {
-              Authorization: `Bearer ${token}`,
-            }
-          : undefined,
+      const response = await axios.get(`${apiUrl}/api/announcements`, {
+        headers: {"Content-Type": "application/json",}
       });
-      setAnnouncements(res.data);
+      const { token, user } = response.data;
+      await AsyncStorage.setItem("token", token);
+      await AsyncStorage.setItem("user", JSON.stringify(user));
+      setAnnouncements(response.data.announcements || []);
     } catch (err) {
       console.error("Failed to load announcements", err);
     } finally {
       setLoading(false);
     }
   };
-  if (API_URL) loadAnnouncements();
-}, [API_URL]);
+  if (apiUrl) loadAnnouncements();
+}, [apiUrl]);
 
   useEffect(() => {
     const loadUser = async () => {
@@ -59,24 +58,20 @@ export default function Index() {
       }
       setUserName(null);
     };
-
     loadUser();
   }, []);
 
   useEffect(() => {
-    if (!API_URL) return
-
-    const wsProtocol = API_URL.startsWith('https') ? 'wss' : 'ws'
-    const wsUrl = `${wsProtocol}://${API_URL.replace(/^https?:\/\//, '')}/ws/announcements`
+    if (!apiUrl) return
+    const wsProtocol = apiUrl.startsWith('https') ? 'wss' : 'ws'
+    const wsUrl = `${wsProtocol}://${apiUrl.replace(/^https?:\/\//, '')}/ws/announcements`
     const ws = new WebSocket(wsUrl)
-
     ws.onopen = () => {
       console.log('Announcements WebSocket connected')
     }
     ws.onmessage = (msg) => {
       try {
         const { event, data } = JSON.parse(msg.data)
-
         if (event === 'new_announcement') {
           setAnnouncements((prev) => {
             const exists = prev.some((a) => a.id === data.id)
@@ -90,7 +85,6 @@ export default function Index() {
         console.error('Invalid WS message', e)
       }
     }
-
     ws.onerror = (err) => {
       console.error('WebSocket error', err)
     }
@@ -100,7 +94,7 @@ export default function Index() {
     return () => {
       ws.close()
     }
-  }, [API_URL])
+  }, [apiUrl])
 
 
 
