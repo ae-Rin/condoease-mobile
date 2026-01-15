@@ -15,19 +15,28 @@ export default function Index() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const loadAnnouncements = async () => {
-      try {
-        const res = await axios.get(`${API_URL}/api/announcements`);
-        setAnnouncements(res.data);
-      } catch (err) {
-        console.error("Failed to load announcements", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (API_URL) loadAnnouncements();
-  }, [API_URL]);
+  const loadAnnouncements = async () => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+      // const json = await AsyncStorage.getItem("user");
+      // const u = json ? JSON.parse(json) : null;
+      // const token = u?.token;
+      const res = await axios.get(`${API_URL}/api/announcements`, {
+        headers: token
+          ? {
+              Authorization: `Bearer ${token}`,
+            }
+          : undefined,
+      });
+      setAnnouncements(res.data);
+    } catch (err) {
+      console.error("Failed to load announcements", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+  if (API_URL) loadAnnouncements();
+}, [API_URL]);
 
   useEffect(() => {
     const loadUser = async () => {
