@@ -17,19 +17,19 @@ export default function Index() {
   useEffect(() => {
   const loadAnnouncements = async () => {
     try {
-      // const token = await AsyncStorage.getItem("token");
-      const json = await AsyncStorage.getItem("user");
-      const u = json ? JSON.parse(json) : null;
-      const token = u?.token;
-      const response = await axios.get(`${apiUrl}/api/announcements`, {
-        headers: { 
-          Authorization: `Bearer ${token}`
-        }
+      const token = await AsyncStorage.getItem("token");
+      // const json = await AsyncStorage.getItem("user");
+      // const u = json ? JSON.parse(json) : null;
+      // const token = u?.token;
+      const response = await fetch(`${apiUrl}/api/announcements`, {
+        headers: token
+          ? {
+              Authorization: `Bearer ${token}`,
+            }
+          : undefined,
       });
-      const { user } = response.data;
-      await AsyncStorage.setItem("token", token);
-      await AsyncStorage.setItem("user", JSON.stringify(user));
-      setAnnouncements(response.data.announcements || []);
+      const data = await response.json();
+      setAnnouncements(data);
     } catch (err) {
       console.error("Failed to load announcements", err);
     } finally {
