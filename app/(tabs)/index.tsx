@@ -15,29 +15,30 @@ export default function Index() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-  const loadAnnouncements = async () => {
-    try {
-      const token = await AsyncStorage.getItem("token");
-      // const json = await AsyncStorage.getItem("user");
-      // const u = json ? JSON.parse(json) : null;
-      // const token = u?.token;
-      const response = await fetch(`${apiUrl}/api/announcements`, {
-        headers: token
-          ? {
-              Authorization: `Bearer ${token}`,
-            }
-          : undefined,
-      });
-      const data = await response.json();
-      setAnnouncements(data);
-    } catch (err) {
-      console.error("Failed to load announcements", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-  if (apiUrl) loadAnnouncements();
-}, [apiUrl]);
+    const loadAnnouncements = async () => {
+      try {
+        const userJson = await AsyncStorage.getItem("user");
+        const user = userJson ? JSON.parse(userJson) : null;
+        const token = user?.token;
+
+        const res = await fetch(`${apiUrl}/api/announcements`, {
+          headers: token
+            ? {
+                Authorization: `Bearer ${token}`,
+              }
+            : undefined,
+        });
+
+        const data = await res.json();
+        setAnnouncements(data);
+      } catch (err) {
+        console.error("Failed to load announcements", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    if (apiUrl) loadAnnouncements();
+  }, [apiUrl]);
 
   useEffect(() => {
     const loadUser = async () => {
