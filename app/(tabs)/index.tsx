@@ -18,13 +18,15 @@ export default function Index() {
   const loadAnnouncements = async () => {
     try {
       // const token = await AsyncStorage.getItem("token");
-      // const json = await AsyncStorage.getItem("user");
-      // const u = json ? JSON.parse(json) : null;
-      // const token = u?.token;
+      const json = await AsyncStorage.getItem("user");
+      const u = json ? JSON.parse(json) : null;
+      const token = u?.token;
       const response = await axios.get(`${apiUrl}/api/announcements`, {
-        headers: {"Content-Type": "application/json",}
+        headers: { 
+          Authorization: `Bearer ${token}`
+        }
       });
-      const { token, user } = response.data;
+      const { user } = response.data;
       await AsyncStorage.setItem("token", token);
       await AsyncStorage.setItem("user", JSON.stringify(user));
       setAnnouncements(response.data.announcements || []);
