@@ -21,16 +21,14 @@ export default function Index() {
         const user = userJson ? JSON.parse(userJson) : null;
         const token = user?.token;
 
-        const res = await fetch(`${apiUrl}/api/announcements`, {
+        const response = await axios.get(`${apiUrl}/api/announcements?userId=${user.id}`, {
           headers: token
             ? {
                 Authorization: `Bearer ${token}`,
               }
             : undefined,
         });
-
-        const data = await res.json();
-        setAnnouncements(data);
+        setAnnouncements(response.data.announcements);
       } catch (err) {
         console.error("Failed to load announcements", err);
       } finally {
